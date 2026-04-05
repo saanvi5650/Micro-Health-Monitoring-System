@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthMonitor — Micro Health System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #F0F4F8;
+      --surface:   #FFFFFF;
+      --border:    #E2E8F0;
+      --text:      #0F172A;
+      --muted:     #64748B;
+      --accent:    #2563EB;
+      --accent-d:  #1D4ED8;
+      --success:   #10B981;
+      --danger:    #EF4444;
+      --warning:   #F59E0B;
+    }
+
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background grid pattern ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Soft glow blobs ── */
+    .blob {
+      position: fixed; border-radius: 50%;
+      filter: blur(80px); pointer-events: none; z-index: 0;
+    }
+    .blob-1 {
+      width: 500px; height: 500px;
+      background: rgba(37,99,235,0.07);
+      top: -100px; right: -100px;
+    }
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: rgba(16,185,129,0.06);
+      bottom: -80px; left: -80px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      z-index: 100;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 16px; color: var(--text);
+    }
+    .nav-brand .pulse-dot {
+      width: 9px; height: 9px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      color: var(--muted);
+      padding: 7px 16px;
+      border-radius: 8px;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { background: #EFF6FF; color: var(--accent); }
+    .nav-links .btn-nav {
+      background: var(--accent); color: #fff;
+      border-radius: 8px; padding: 8px 20px;
+    }
+    .nav-links .btn-nav:hover { background: var(--accent-d); color: #fff; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: var(--accent);
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 1.1;
+      letter-spacing: -1px;
+      color: var(--text);
+      max-width: 760px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .hero h1 .accent-word {
+      color: var(--accent);
+      position: relative;
+      display: inline-block;
+    }
+    .hero h1 .accent-word::after {
+      content: '';
+      position: absolute; left: 0; bottom: 4px; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      border-radius: 99px;
+    }
+
+    .hero p {
+      font-size: 18px; color: var(--muted);
+      max-width: 520px; line-height: 1.7;
+      margin: 20px auto 40px;
+      font-weight: 400;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    /* ── CTA Cards ── */
+    .cta-row {
+      display: flex; gap: 20px; justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .cta-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      width: 280px;
+      text-decoration: none;
+      color: var(--text);
+      text-align: left;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.06);
+      position: relative; overflow: hidden;
+    }
+    .cta-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .cta-card.citizen::before { background: linear-gradient(90deg, var(--accent), #60A5FA); }
+    .cta-card.admin::before   { background: linear-gradient(90deg, var(--success), #34D399); }
+
+    .cta-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(15,23,42,0.12);
+      border-color: transparent;
+    }
+    .cta-card.citizen:hover { box-shadow: 0 16px 40px rgba(37,99,235,0.15); }
+    .cta-card.admin:hover   { box-shadow: 0 16px 40px rgba(16,185,129,0.15); }
+
+    .cta-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 16px;
+    }
+    .cta-card.citizen .cta-icon { background: #EFF6FF; }
+    .cta-card.admin   .cta-icon { background: #ECFDF5; }
+
+    .cta-card h3 {
+      font-size: 17px; font-weight: 700; margin-bottom: 6px;
+    }
+    .cta-card p {
+      font-size: 13px; color: var(--muted);
+      line-height: 1.5; margin: 0;
+    }
+    .cta-arrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 18px;
+      font-size: 13px; font-weight: 600;
+    }
+    .cta-card.citizen .cta-arrow { color: var(--accent); }
+    .cta-card.admin   .cta-arrow { color: var(--success); }
+
+    .register-link {
+      margin-top: 28px;
+      font-size: 14px; color: var(--muted);
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .register-link a {
+      color: var(--accent); font-weight: 600; text-decoration: none;
+    }
+    .register-link a:hover { text-decoration: underline; }
+
+    /* ── Stats strip ── */
+    .stats-strip {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center;
+      gap: 0;
+      padding: 0 24px 80px;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 20px 48px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .val {
+      font-family: 'DM Mono', monospace;
+      font-size: 28px; font-weight: 700;
+      color: var(--text); letter-spacing: -1px;
+    }
+    .stat-item .lbl {
+      font-size: 12px; color: var(--muted);
+      margin-top: 4px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    /* ── Features ── */
+    .features {
+      position: relative; z-index: 1;
+      max-width: 960px; margin: 0 auto;
+      padding: 0 24px 100px;
+    }
+    .features-label {
+      text-align: center;
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--accent); margin-bottom: 12px;
+    }
+    .features h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(28px, 4vw, 40px);
+      text-align: center; margin-bottom: 48px;
+      letter-spacing: -0.5px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 8px 24px rgba(15,23,42,0.09);
+      transform: translateY(-2px);
+    }
+    .feature-card .f-icon {
+      font-size: 26px; margin-bottom: 14px;
+    }
+    .feature-card h4 {
+      font-size: 15px; font-weight: 700; margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 13px; color: var(--muted); line-height: 1.6;
+    }
+
+    /* ── Live ticker ── */
+    .live-ticker {
+      position: relative; z-index: 1;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      overflow: hidden; margin-bottom: 0;
+    }
+    .ticker-inner {
+      display: flex; gap: 64px;
+      animation: ticker 18s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      flex-shrink: 0;
+    }
+    .ticker-item .ti-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .ticker-item.normal  .ti-dot { background: var(--success); }
+    .ticker-item.warning .ti-dot { background: var(--warning); }
+    .ticker-item.danger  .ti-dot { background: var(--danger); }
+    .ticker-val { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--text); }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px; color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    footer strong { color: var(--text); }
+
+    /* ── Keyframes ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.3); }
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links a:not(.btn-nav) { display: none; }
+      .hero h1 { font-size: 36px; }
+      .hero p  { font-size: 16px; }
+      .cta-card { width: 100%; max-width: 340px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .stat-item { padding: 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-brand">
+    <span>🏥</span>
+    <span>HealthMonitor</span>
+    <span class="pulse-dot"></span>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="auth/register.html">Register</a>
+    <a href="auth/citizen-login.html" class="btn-nav">Sign In</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+
+  <div class="hero-badge">
+    <span class="dot"></span>
+    System Online — All Services Active
+  </div>
+
+  <h1>
+    Community Health<br>
+    <span class="accent-word">Monitoring</span> Platform
+  </h1>
+
+  <p>
+    Real-time vital tracking, intelligent risk assessment,
+    and instant alerts — keeping citizens and administrators
+    connected to health data that matters.
+  </p>
+
+  <div class="cta-row">
+
+    <a href="auth/citizen-login.html" class="cta-card citizen">
+      <div class="cta-icon">👤</div>
+      <h3>Citizen Portal</h3>
+      <p>Monitor your vitals, submit health data, and receive personalised risk alerts.</p>
+      <div class="cta-arrow">Access portal →</div>
+    </a>
+
+    <a href="auth/admin-login.html" class="cta-card admin">
+      <div class="cta-icon">🔐</div>
+      <h3>Admin Dashboard</h3>
+      <p>Oversee all patients, manage high-risk alerts, and analyse community health trends.</p>
+      <div class="cta-arrow">Admin login →</div>
+    </a>
+
+  </div>
+
+  <p class="register-link">
+    New here? <a href="auth/register.html">Create a citizen account</a>
+  </p>
+
+</section>
+
+<!-- Live Ticker -->
+<div class="live-ticker">
+  <div class="ticker-inner" id="ticker">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="val">99.9%</div>
+    <div class="lbl">Uptime</div>
+  </div>
+  <div class="stat-item">
+    <div class="val">&lt; 1s</div>
+    <div class="lbl">Alert Response</div>
+  </div>
+  <div class="stat-item">
+    <div class="val">3</div>
+    <div class="lbl">Risk Levels</div>
+  </div>
+  <div class="stat-item">
+    <div class="val">24/7</div>
+    <div class="lbl">Monitoring</div>
+  </div>
+</div>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="features-label">What's included</div>
+  <h2>Everything you need in one place</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="f-icon">❤️</div>
+      <h4>Live Vital Tracking</h4>
+      <p>Heart rate, temperature, oxygen saturation and blood pressure monitored continuously in real time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">🤖</div>
+      <h4>AI Risk Assessment</h4>
+      <p>Automated scoring engine classifies each submission as Low, Medium, or High risk instantly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">🚨</div>
+      <h4>Instant Alerts</h4>
+      <p>High-risk patients surface immediately in the admin panel with auto-refresh every 10 seconds.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">📊</div>
+      <h4>Analytics & Charts</h4>
+      <p>Visual dashboards with trend lines, risk distribution charts, and weekly case comparisons.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">👥</div>
+      <h4>Patient Management</h4>
+      <p>Admins can search, filter, and view detailed records for every registered patient.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">🔒</div>
+      <h4>Role-Based Access</h4>
+      <p>Separate portals for citizens and administrators with protected routes and session management.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <strong>HealthMonitor</strong> — Micro Health System &nbsp;·&nbsp;
+  Built for community health monitoring &nbsp;·&nbsp;
+  <a href="auth/citizen-login.html" style="color:var(--accent);text-decoration:none;">Sign in</a>
+</footer>
+
+<script>
+  // Live ticker with simulated readings
+  const readings = [
+    { label: "Heart Rate", val: "72 bpm",  cls: "normal"  },
+    { label: "Temperature", val: "36.8°C", cls: "normal"  },
+    { label: "Oxygen",      val: "98%",    cls: "normal"  },
+    { label: "BP",          val: "118/76", cls: "normal"  },
+    { label: "Heart Rate",  val: "104 bpm",cls: "danger"  },
+    { label: "Temperature", val: "38.7°C", cls: "warning" },
+    { label: "Oxygen",      val: "91%",    cls: "danger"  },
+    { label: "Heart Rate",  val: "68 bpm", cls: "normal"  },
+    { label: "Temperature", val: "37.1°C", cls: "normal"  },
+    { label: "Oxygen",      val: "96%",    cls: "normal"  },
+    { label: "BP",          val: "145/90", cls: "warning" },
+    { label: "Heart Rate",  val: "88 bpm", cls: "normal"  },
+  ];
+
+  // Duplicate for seamless loop
+  const all = [...readings, ...readings];
+  const ticker = document.getElementById("ticker");
+  ticker.innerHTML = all.map(r => `
+    <div class="ticker-item ${r.cls}">
+      <span class="ti-dot"></span>
+      ${r.label}: <span class="ticker-val">${r.val}</span>
+    </div>
+  `).join("");
+
+  // If user is already logged in, redirect them
+  const role = localStorage.getItem("role");
+  if (role === "admin") {
+    // Don't auto-redirect — let them choose, but update CTA
+  }
+</script>
+
+</body>
+</html>

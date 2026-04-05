@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Details — Admin Panel</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="app-layout">
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>🏥 HealthMonitor</h2>
+    <span class="role-badge">Admin</span>
+  </div>
+  <nav>
+    <a href="admin-dashboard.html"><span class="icon">📊</span> Dashboard</a>
+    <a href="patients.html"><span class="icon">👥</span> Patients</a>
+    <a href="adalerts.html"><span class="icon">🚨</span> Alerts</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="#" onclick="logout()">🚪 Sign Out</a>
+  </div>
+</aside>
+
+<main class="page-content">
+
+  <div class="page-header">
+    <div class="header-row">
+      <div>
+        <h1 id="patientName">Patient Overview</h1>
+        <p id="patientMeta">Loading patient record…</p>
+      </div>
+      <a href="patients.html" class="btn btn-ghost btn-sm">← Back to Patients</a>
+    </div>
+  </div>
+
+  <!-- Vital Cards -->
+  <div class="grid-4 section-gap" id="vitalsRow">
+    <div class="stat-card danger">
+      <div class="stat-icon">❤️</div>
+      <div class="stat-label">Heart Rate</div>
+      <div class="stat-value" id="detHeart">—</div>
+      <div class="stat-status text-danger" id="detHeartStatus">—</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-icon">🌡️</div>
+      <div class="stat-label">Temperature</div>
+      <div class="stat-value" id="detTemp">—</div>
+      <div class="stat-status" id="detTempStatus">—</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon">🩸</div>
+      <div class="stat-label">Blood Pressure</div>
+      <div class="stat-value" style="font-size:20px;" id="detBP">—</div>
+      <div class="stat-status" id="detBPStatus">mmHg</div>
+    </div>
+    <div class="stat-card info">
+      <div class="stat-icon">📊</div>
+      <div class="stat-label">Risk Level</div>
+      <div class="stat-value" style="font-size:18px;margin-top:6px;" id="detRisk">—</div>
+      <div class="stat-status" id="detRiskStatus">—</div>
+    </div>
+  </div>
+
+  <div class="grid-2-1 section-gap">
+
+    <!-- Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Vital History (simulated)</div>
+          <div class="chart-subtitle">Last 6 readings</div>
+        </div>
+      </div>
+      <div style="height:220px;">
+        <canvas id="patientChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Symptoms + Notes -->
+    <div class="card">
+      <h3>Patient Info</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;font-size:14px;">
+        <div class="flex-between">
+          <span class="text-muted">Name</span>
+          <strong id="infoName">—</strong>
+        </div>
+        <div class="flex-between">
+          <span class="text-muted">Age</span>
+          <strong id="infoAge">—</strong>
+        </div>
+        <div class="flex-between">
+          <span class="text-muted">Cough</span>
+          <strong id="infoCough">—</strong>
+        </div>
+        <div>
+          <span class="text-muted">Symptoms</span>
+          <p id="infoSymptoms" style="margin-top:4px;color:var(--text-primary);">—</p>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <h3>Medical Notes</h3>
+      <textarea class="form-control" id="medNotes" rows="4"
+                placeholder="Add clinical notes here…"
+                style="resize:vertical;margin-top:8px;"></textarea>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="saveNotes()">
+        Save Notes
+      </button>
+    </div>
+
+  </div>
+
+</main>
+</div>
+
+<script src="../js/shared.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+// Load from localStorage if navigated via "View" button
+document.addEventListener("DOMContentLoaded", async function () {
+  const patientId = localStorage.getItem("viewPatientId");
+
+  // Try to find patient from all reports
+  try {
+    const data = await apiFetch("/api/health/reports");
+    let patient = data[0]; // default first
+    if (patientId) {
+      patient = data.find(p => (p._id || p.id) === patientId) || data[0];
+    }
+
+    if (!patient) {
+      document.getElementById("patientMeta").textContent = "Patient not found.";
+      return;
+    }
+
+    // Populate
+    document.getElementById("patientName").textContent = patient.name || "Unknown Patient";
+    document.getElementById("patientMeta").textContent = `Age: ${patient.age || "—"} • Submitted record`;
+    document.getElementById("infoName").textContent    = patient.name || "—";
+    document.getElementById("infoAge").textContent     = patient.age  || "—";
+    document.getElementById("infoCough").textContent   = patient.cough ? "Yes" : "No";
+    document.getElementById("infoSymptoms").textContent= patient.symptoms || "None reported";
+
+    document.getElementById("detHeart").textContent   = "—";         // not in model
+    document.getElementById("detTemp").textContent    = patient.temperature ? patient.temperature + "°C" : "—";
+    document.getElementById("detBP").textContent      = patient.bp   || "—";
+    document.getElementById("detRisk").textContent    = patient.riskLevel || "—";
+
+    const risk = patient.riskLevel || "Low";
+    document.getElementById("detRiskStatus").innerHTML = riskBadge(risk);
+    document.getElementById("detTempStatus").textContent =
+      patient.temperature > 38 ? "⚠️ Elevated" : "Normal";
+
+    // Simulated chart
+    const labels = ["T-5", "T-4", "T-3", "T-2", "T-1", "Now"];
+    const baseTemp = patient.temperature || 37;
+    const tempData = labels.map((_, i) => (baseTemp - 0.3 + Math.random() * 0.6).toFixed(1));
+    tempData[tempData.length - 1] = baseTemp;
+
+    new Chart(document.getElementById("patientChart"), {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "Temperature (°C)",
+          data: tempData,
+          borderColor: "#F59E0B",
+          backgroundColor: "rgba(245,158,11,0.08)",
+          tension: 0.4, fill: true, pointRadius: 4,
+          pointBackgroundColor: "#F59E0B",
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: "top", labels: { font: { size: 12 } } } },
+        scales: {
+          x: { grid: { color: "rgba(0,0,0,0.04)" } },
+          y: { grid: { color: "rgba(0,0,0,0.04)" } },
+        },
+      },
+    });
+
+  } catch (err) {
+    showToast("Could not load patient data", "error");
+  }
+});
+
+function saveNotes() {
+  const notes = document.getElementById("medNotes").value;
+  localStorage.setItem("patientNotes_" + (localStorage.getItem("viewPatientId") || "default"), notes);
+  showToast("Notes saved successfully", "success");
+}
+</script>
+</body>
+</html>

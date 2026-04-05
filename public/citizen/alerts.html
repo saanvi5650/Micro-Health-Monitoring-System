@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alert History — Health Monitor</title>
+  <link rel="stylesheet" href="../css/theme.css">
+</head>
+<body>
+
+<div class="app-layout">
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>🏥 HealthMonitor</h2>
+    <span class="role-badge">Citizen</span>
+  </div>
+  <nav>
+    <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+    <a href="monitoring.html"><span class="icon">📡</span> Monitoring</a>
+    <a href="alerts.html" class="active"><span class="icon">🔔</span> Alerts</a>
+    <a href="analytics.html"><span class="icon">📈</span> Submit Data</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="#" onclick="logout()">🚪 Sign Out</a>
+  </div>
+</aside>
+
+<main class="page-content">
+
+  <div class="page-header">
+    <h1>Alert History</h1>
+    <p>Your past health alerts and notifications.</p>
+  </div>
+
+  <!-- Live Alerts -->
+  <div class="card section-gap">
+    <h3>Active Alerts</h3>
+    <div id="alertsContainer">
+      <div class="loading-row"><span class="spinner"></span> Checking vitals…</div>
+    </div>
+  </div>
+
+  <!-- History Table -->
+  <div class="card">
+    <h3>Past Alerts</h3>
+    <div class="table-wrap mt-2">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Type</th>
+            <th>Severity</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="alertHistoryBody">
+          <tr>
+            <td>Today 10:45 AM</td>
+            <td>Heart Rate Spike</td>
+            <td><span class="badge badge-danger">Critical</span></td>
+            <td><span class="badge badge-info">Resolved</span></td>
+          </tr>
+          <tr>
+            <td>Yesterday 3:12 PM</td>
+            <td>Elevated Temperature</td>
+            <td><span class="badge badge-warning">Warning</span></td>
+            <td><span class="badge badge-info">Checked</span></td>
+          </tr>
+          <tr>
+            <td>3 days ago</td>
+            <td>Low Oxygen</td>
+            <td><span class="badge badge-danger">Critical</span></td>
+            <td><span class="badge badge-success">Resolved</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script src="../js/shared.js"></script>
+<script src="../js/citizen.js"></script>
+</body>
+</html>

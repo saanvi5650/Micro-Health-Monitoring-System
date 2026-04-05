@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Health Monitor</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="app-layout">
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>🏥 HealthMonitor</h2>
+    <span class="role-badge">Citizen</span>
+  </div>
+  <nav>
+    <a href="dashboard.html" class="active">
+      <span class="icon">📊</span> Dashboard
+    </a>
+    <a href="monitoring.html">
+      <span class="icon">📡</span> Monitoring
+    </a>
+    <a href="alerts.html">
+      <span class="icon">🔔</span> Alerts
+    </a>
+    <a href="analytics.html">
+      <span class="icon">📈</span> Submit Data
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="#" onclick="logout()">🚪 Sign Out</a>
+  </div>
+</aside>
+
+<!-- PAGE CONTENT -->
+<main class="page-content">
+
+  <div class="page-header">
+    <div class="header-row">
+      <div>
+        <h1 id="greetUser">Welcome 👋</h1>
+        <p>Here's your health summary for today.</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);">
+        <span style="width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block;animation:pulse 2s infinite;"></span>
+        Live monitoring active
+      </div>
+    </div>
+  </div>
+
+  <!-- Vital Stat Cards -->
+  <div class="grid-4 section-gap">
+    <div class="vital-card live">
+      <div class="vital-icon">❤️</div>
+      <div class="vital-label">Heart Rate</div>
+      <div class="vital-value" id="liveHeart">—</div>
+      <div class="vital-unit">bpm</div>
+      <div class="vital-status"><span class="badge badge-success">Normal</span></div>
+    </div>
+    <div class="vital-card live">
+      <div class="vital-icon">🌡️</div>
+      <div class="vital-label">Temperature</div>
+      <div class="vital-value" id="liveTemp">—</div>
+      <div class="vital-unit">°C</div>
+      <div class="vital-status"><span class="badge badge-success">Normal</span></div>
+    </div>
+    <div class="vital-card live">
+      <div class="vital-icon">🩸</div>
+      <div class="vital-label">Oxygen Saturation</div>
+      <div class="vital-value" id="liveOxy">—</div>
+      <div class="vital-unit">%</div>
+      <div class="vital-status"><span class="badge badge-success">Good</span></div>
+    </div>
+    <div class="vital-card live">
+      <div class="vital-icon">💉</div>
+      <div class="vital-label">Blood Pressure</div>
+      <div class="vital-value" style="font-size:22px;" id="liveBP">—</div>
+      <div class="vital-unit">mmHg</div>
+      <div class="vital-status">
+        Overall: <strong id="liveStatus" class="text-success">—</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart + Alerts -->
+  <div class="grid-2-1 section-gap">
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Vitals Trend</div>
+          <div class="chart-subtitle">Last 10 minutes</div>
+        </div>
+        <span class="badge badge-info">Auto-refresh</span>
+      </div>
+      <div style="height:240px;">
+        <canvas id="vitalsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Active Alerts</h3>
+      <div id="alertsContainer">
+        <div class="loading-row"><span class="spinner"></span> Checking…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="card section-gap">
+    <h3>Quick Actions</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;">
+      <a href="analytics.html" class="btn btn-primary">📋 Submit Health Data</a>
+      <a href="monitoring.html" class="btn btn-outline">📡 Live Monitoring</a>
+      <a href="alerts.html" class="btn btn-ghost">🔔 View Alert History</a>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script src="../js/shared.js"></script>
+<script src="../js/citizen.js"></script>
+</body>
+</html>

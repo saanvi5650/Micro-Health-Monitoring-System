@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Monitoring — Health Monitor</title>
+  <link rel="stylesheet" href="../css/theme.css">
+</head>
+<body>
+
+<div class="app-layout">
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>🏥 HealthMonitor</h2>
+    <span class="role-badge">Citizen</span>
+  </div>
+  <nav>
+    <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+    <a href="monitoring.html" class="active"><span class="icon">📡</span> Monitoring</a>
+    <a href="alerts.html"><span class="icon">🔔</span> Alerts</a>
+    <a href="analytics.html"><span class="icon">📈</span> Submit Data</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="#" onclick="logout()">🚪 Sign Out</a>
+  </div>
+</aside>
+
+<main class="page-content">
+
+  <div class="page-header">
+    <h1>Live Monitoring</h1>
+    <p>Real-time device status and vital readings.</p>
+  </div>
+
+  <div class="grid-2" style="max-width:760px;">
+
+    <div class="card">
+      <h3>Device Status</h3>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px;">
+        <div class="flex-between">
+          <span style="color:var(--text-secondary);font-size:14px;">Connection</span>
+          <span class="badge badge-success">Connected ✅</span>
+        </div>
+        <div class="flex-between">
+          <span style="color:var(--text-secondary);font-size:14px;">Battery</span>
+          <span style="font-weight:600;font-family:var(--font-mono);">85%</span>
+        </div>
+        <div class="flex-between">
+          <span style="color:var(--text-secondary);font-size:14px;">Last Sync</span>
+          <span id="lastSync" style="font-size:13px;color:var(--text-muted);">Just now</span>
+        </div>
+        <div class="flex-between">
+          <span style="color:var(--text-secondary);font-size:14px;">Signal</span>
+          <span class="badge badge-success">Strong</span>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:20px;width:100%;" onclick="refreshSync()">
+        🔄 Refresh
+      </button>
+    </div>
+
+    <div class="card">
+      <h3>Current Readings</h3>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px;">
+        <div class="flex-between">
+          <span style="color:var(--text-secondary);font-size:14px;">❤️ Heart Rate</span>
+          <span class="font-mono font-bold" id="liveHeart">— bpm</span>
+        </div>
+        <div class="flex-between">
+          <span style="color:var(--text-secondary);font-size:14px;">🌡️ Temperature</span>
+          <span class="font-mono font-bold" id="liveTemp">—°C</span>
+        </div>
+        <div class="flex-between">
+          <span style="color:var(--text-secondary);font-size:14px;">🩸 Oxygen</span>
+          <span class="font-mono font-bold" id="liveOxy">— %</span>
+        </div>
+        <div class="flex-between">
+          <span style="color:var(--text-secondary);font-size:14px;">📊 Status</span>
+          <strong id="liveStatus" class="text-success">—</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card mt-3" style="max-width:760px;">
+    <h3>Emergency Actions</h3>
+    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">
+      Use this only if you are experiencing a medical emergency.
+    </p>
+    <button class="btn btn-danger" onclick="triggerEmergency()">
+      🚨 Trigger Emergency Alert
+    </button>
+  </div>
+
+</main>
+</div>
+
+<script src="../js/shared.js"></script>
+<script src="../js/citizen.js"></script>
+<script>
+function refreshSync() {
+  const el = document.getElementById("lastSync");
+  if (el) el.textContent = "Just now";
+  showToast("Device synced successfully", "success");
+}
+function triggerEmergency() {
+  if (confirm("Are you sure you want to trigger an emergency alert? This will notify medical staff immediately.")) {
+    showToast("🚨 Emergency alert sent to medical team!", "error", 5000);
+  }
+}
+</script>
+</body>
+</html>

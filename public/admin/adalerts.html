@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>High Risk Alerts — Admin Panel</title>
+  <link rel="stylesheet" href="../css/theme.css">
+</head>
+<body>
+
+<div class="app-layout">
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>🏥 HealthMonitor</h2>
+    <span class="role-badge">Admin</span>
+  </div>
+  <nav>
+    <a href="admin-dashboard.html"><span class="icon">📊</span> Dashboard</a>
+    <a href="patient.html"><span class="icon">👥</span> Patients</a>
+    <a href="adalerts.html" class="active"><span class="icon">🚨</span> Alerts</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="#" onclick="logout()">🚪 Sign Out</a>
+  </div>
+</aside>
+
+<main class="page-content">
+
+  <div class="page-header">
+    <div class="header-row">
+      <div>
+        <h1>🚨 High Risk Alerts</h1>
+        <p>Patients requiring immediate attention. Auto-refreshes every 10 seconds.</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="loadAlerts()">🔄 Refresh Now</button>
+    </div>
+  </div>
+
+  <div id="alertsContainer">
+    <div class="loading-row"><span class="spinner"></span> Loading alerts…</div>
+  </div>
+
+</main>
+</div>
+
+<script src="../js/shared.js"></script>
+<script src="../js/admin-alerts.js"></script>
+</body>
+</html>

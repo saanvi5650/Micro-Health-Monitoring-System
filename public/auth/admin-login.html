@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Sign In — Health Monitor</title>
+  <link rel="stylesheet" href="../css/theme.css">
+</head>
+<body class="auth-page">
+
+<div class="auth-box">
+
+  <div class="auth-logo">
+    <div class="logo-mark">🔐</div>
+    <h1>Admin Portal</h1>
+    <p>Restricted access — authorised personnel only</p>
+  </div>
+
+  <div class="auth-card">
+    <h2>Admin Sign In</h2>
+    <p class="auth-subtitle">Enter your admin credentials to continue</p>
+
+    <form onsubmit="adminLogin(event)">
+
+      <div class="form-group">
+        <label for="adminUser">Username or Email</label>
+        <input class="form-control" type="text" id="adminUser"
+               placeholder="admin@hospital.com" required autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="adminPass">Password</label>
+        <input class="form-control" type="password" id="adminPass"
+               placeholder="Enter your password" required autocomplete="current-password">
+      </div>
+
+      <button class="btn btn-primary btn-full" type="submit" style="margin-top:8px;">
+        Sign In
+      </button>
+
+    </form>
+
+    <div class="auth-footer" style="margin-top:20px;">
+      ← <a href="citizen-login.html">Back to citizen login</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="../js/shared.js"></script>
+<script src="../js/auth.js"></script>
+</body>
+</html>
