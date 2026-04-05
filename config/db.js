@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
     try {
         await mongoose.connect(
-            "mongodb+srv://saanvi0565_db_user:saanvi05@cluster0.7hkqpbd.mongodb.net/microhealth?retryWrites=true&w=majority"
+            "mongodb+srv://username_db_user:password@cluster0.abcdsefg.mongodb.net/microhealth?retryWrites=true&w=majority"
         );
         console.log("MongoDB Connected");
     } catch (error) {
